@@ -1,8 +1,9 @@
+import Watcher from './watcher';
+
 let DEP_ID = 0;
 
-
 class Dep {
-  public static target: Dep | null = null;
+  public static target : Watcher | null = null;
   public id: number;
   public subscribers: any[];
   constructor() {
