@@ -13,6 +13,7 @@
     "no-empty": false,
     "object-literal-sort-keys": false,
     "no-string-literal": false,
-    "no-console": [true, "warning"]
+    "no-console": [true, "warning"],
+    "prefer-for-of": false
   }
 }
