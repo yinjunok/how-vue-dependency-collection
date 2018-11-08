@@ -5,16 +5,140 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>MVVM 测试</title>
-  <style>
-    body {
-      background: black;
-    }
-  </style>
+
 </head>
 <body>
-  <script src="./lib/main.js"></script>
+  <!-- <script src="./lib/main.js"></script> -->
+  <div id="container">
+    <p>{{a}}</p>
+    <p>{{b}}</p>
+  </div>
+  <button id="btn">加一</button>
   <script>
-    const mvvm = new Mvvm();
+    // 读的时候收集依赖
+    // 写的时候发布修改信息
+
+    let global = null;
+
+    // 解析出模板里的变量.
+    class Compile {
+      constructor(vm) {
+        this.vm = vm;
+        this.el = document.getElementById(vm.$el);
+        this.$fragment = this.node2Fragment(this.el);
+        this.parseHtml();
+        this.el.appendChild(this.$fragment);
+      }
+
+      node2Fragment(el) {
+        const fragment = document.createDocumentFragment();
+
+        let node = null;
+        while (node = this.el.firstChild) {
+          fragment.appendChild(node);
+        }
+        return fragment;
+      }
+
+      parseHtml() {
+        const childNodes = this.$fragment.childNodes;
+        const reg = /\{\{(.*)\}\}/;
+        for (let i = 0; i < childNodes.length; ++i) {
+          const node = childNodes[i];
+          const text = node.textContent;
+          const match = text.match(reg);
+          
+          if (match !== null) {
+            node.textContent = this.vm[match[1]];
+            this.vm.watch(match[1], (val) => {
+              node.textContent = val;
+            });
+          }
+        }
+      }
+    }
+
+    class V {
+      constructor(options) {
+        this.$el = options.el;
+        this.$data = options.data;
+        this.$computed = options.computed;
+        const data = options.data;
+        
+        Object.keys(data).forEach(key => {
+          this.defineReactive(this, key, data[key]);
+        });
+        
+        this.initComputed();
+
+        new Compile(this);
+      }
+
+      defineReactive(obj, key, val) {
+        const subs = [];
+
+        Object.defineProperty(obj, key, {
+          get() {
+            if (
+              global !== null && 
+              global.key === key &&
+              subs.indexOf(global.cb) === -1
+            ) {
+              subs.push(global.cb);
+            }
+            return val;
+          },
+          set(newVal) {
+            if (val === newVal) {
+              return;
+            }
+            val = newVal;
+            
+            subs.forEach(sub => sub(val));
+          }
+        });
+      }
+
+      initComputed() {
+        const { $computed } = this;
+        Object.keys($computed).forEach(key => {
+          Object.defineProperty(this, key, {
+            get: $computed[key],
+            set() {
+              throw new Error('计算属性无法设置值');
+            }
+          });
+        });
+      }
+
+      watch(key, cb) {
+        global = {
+          key,
+          cb
+        }
+        this[key];
+        global = null;
+      }
+    }
+
+    const v = new V({
+      el: 'container',
+      data: {
+        a: 100,
+        b: 200,
+      },
+      computed: {
+
+      }
+    });
+    
+    document.getElementById('btn').onclick = function() {
+      v.a += 1;
+      setTimeout(() => {
+        v.b += 2;
+      }, 1000)
+    }
+    
   </script>
 </body>
 </html>
