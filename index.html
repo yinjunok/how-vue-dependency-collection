@@ -49,7 +49,6 @@
           const match = text.match(reg);
           
           if (match !== null) {
-            node.textContent = this.vm[match[1]];
             this.vm.watch(match[1], (val) => {
               node.textContent = val;
             });
@@ -117,6 +116,7 @@
           cb
         }
         this[key];
+        cb(this[key]);
         global = null;
       }
     }
