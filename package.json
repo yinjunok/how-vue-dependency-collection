@@ -5,7 +5,6 @@
   "license": "MIT",
   "scripts": {
     "start": "webpack --watch --colors --progress --mode=development",
-    "build": "webpack --mode=production",
     "all": "run-p start gulp",
     "gulp": "gulp default"
   },
