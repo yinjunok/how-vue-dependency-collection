@@ -1,7 +1,7 @@
 import Compile from './compile';
 
 interface IMethods {
-  [anyComputed: string]: () => any;
+  [anyComputed: string]: (...args) => any;
 }
 
 interface IData {

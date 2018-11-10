@@ -7,8 +7,8 @@ const v: any = new V({
     number: 2,
   },
   methods: {
-    handle() {
-      this.number += 1;
+    handle(e: HTMLInputElement) {
+      this.input = e.value;
     }
   },
 });
