@@ -6,7 +6,11 @@ const v: any = new V({
     input: '',
     number: 2,
   },
-  computed: {},
+  methods: {
+    handle() {
+      this.number += 1;
+    }
+  },
 });
 
 const input: any = document.getElementById('input');

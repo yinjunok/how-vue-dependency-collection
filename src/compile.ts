@@ -23,7 +23,7 @@ class Compile {
     while (node) {
       fragment.appendChild(node);
       node = container.firstChild;
-    } 
+    }
     return fragment;
   }
 
@@ -37,14 +37,34 @@ class Compile {
       if (text === null) {
         continue;
       }
-      
+
       const match = text.match(reg);
       if (match !== null) {
         this.vm.watch(match[1], (val) => {
           node.textContent = val;
         })
       }
+
+      if ((node as HTMLElement).nodeType === 1) {
+        this.dealWithElement(node as HTMLElement);
+      }
     }
+  }
+
+  private dealWithElement(node: HTMLElement) {
+    const attrs = node.attributes;
+    for (let i = 0; i < attrs.length; ++i) {
+      const attr = attrs[i];
+      if (this.isCommond(attr.name)) {
+        const event = attr.name.split(':')[1];
+        node.addEventListener(event, this.vm.methods[attr.value]);
+      }
+    }
+  }
+
+  private isCommond(name: string): boolean {
+    const pre = name.split(':');
+    return pre[0] === 'v-on';
   }
 }
 

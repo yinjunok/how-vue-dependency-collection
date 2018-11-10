@@ -1,7 +1,7 @@
 import Compile from './compile';
 
-interface IComputed {
-  [anyComputed: string]: () => any; 
+interface IMethods {
+  [anyComputed: string]: () => any;
 }
 
 interface IData {
@@ -10,8 +10,8 @@ interface IData {
 
 interface IOptions {
   el: string;
-  computed: IComputed;
   data: IData;
+  methods: IMethods;
 }
 
 // 传送带, 把订阅者传送到 vm 实例属性的订阅者.
@@ -24,17 +24,17 @@ class V {
   public static BELT: IBelt | null = null;
 
   public $data: IData;
-  public $computed: IComputed;
   public $el: string;
+  public methods: IMethods;
   constructor(options: IOptions) {
     this.$el = options.el;
-    this.$computed = options.computed;
     this.$data = options.data;
-
+    this.methods = options.methods;
     Object.keys(options.data).forEach(key => {
       this.defineReactive(key, options.data[key]);
     });
 
+    this.initMethods();
     this.compile();
   }
 
@@ -81,6 +81,14 @@ class V {
         val = newVal;
         subs.forEach(sub => sub(val));
       }
+    });
+  }
+
+  // 初始化方法, 把 this 绑定到方法
+  private initMethods() {
+    const methods = this.methods;
+    Object.keys(methods).forEach(key => {
+      methods[key] = methods[key].bind(this);
     });
   }
 }
