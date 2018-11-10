@@ -9,11 +9,16 @@
 </head>
 <body>
   <div id="container">
-    <input v-on:input="handle" id="input" />
-    <p>{{input}}</p>
+    <input v-on:input="handle" />
+    <br />
+    <span>第一行: </span>
+    <span>{{input}}</span>
+    <br />
+    <span style="color: red;">第二行: </span>
+    <span style="color: red;">{{input}}</span>
     <p>{{number}}</p>
+    <button v-on:click="add">加一</button>
   </div>
-  <button id="btn">加一</button>
   
   <script src="./lib/main.js"></script>
 </body>
