@@ -66,6 +66,34 @@ public watch(key: string, cb: (val) => void) {
 }
 ```
 
+在编译模板的时候, 模板变量就一个观察者, 把这个观察者的放入订阅数组里.
+
+```ts
+private parseHTML() {
+  const childNodes = this.fragment.childNodes;
+  const reg = /\{\{(.*)\}\}/;
+
+  for (let i = 0; i < childNodes.length; i++) {
+    const node = childNodes[i];
+    const text = node.textContent;
+    if (text === null) {
+      continue;
+    }
+
+    const match = text.match(reg);
+    if (match !== null) {
+      // 将观察者放入 subs 数组中
+      this.vm.watch(match[1], (val) => {
+        node.textContent = val;
+      })
+    }
+
+    if ((node as HTMLElement).nodeType === 1) {
+      this.dealWithElement(node as HTMLElement);
+    }
+  }
+}
+```
 
 参考:   
 https://github.com/DMQ/mvvm  
